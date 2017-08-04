@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html ng-app="example">
+
+<head lang="en">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Places</title>
+
+
+  <link rel="stylesheet" href="./dist/bootstrap.min.css">
+  <link rel="stylesheet" href="./dist/autocomplete.min.css">
+  <link rel="stylesheet" href="./style.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDABebgErRCt5pqIUUKzDKuvetllrdr0EU&libraries=placeses,visualization,drawing,geometry,places"></script>
+  <script src="https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/scripts/ng-map.js"></script>
+  <script src="./dist/autocomplete.min.js"></script>
+
+  <script>
+    angular.module('ngMap').run(function ($rootScope) {
+      // $rootScope.mouseover = function () {
+      //   console.log('mouseover', this);
+      //   this.style.backgroundColor = 'grey';
+      // };
+      // $rootScope.mouseout = function () {
+      //   this.style.backgroundColor = 'white';
+      // };
+      // $rootScope.click = function () { console.log('click') };
+      // $rootScope.customMarkers = [
+      //   { address: "1600 pennsylvania ave, washington DC", "class": "my1" },
+      //   { address: "600 pennsylvania ave, washington DC", "class": "my2" },
+      // ];
+    });
+    angular.module('example', ['google.places', 'ngMap'])
+      // Setup a basic controller with a scope variable 'place'
+      .controller('MainCtrl', function ($scope) {
+        $scope.place = null;
+        $scope.isMapVisible = false;
+        $scope.myJourney = {};
+        $scope.customMarkers = [
+          // { address: "Wakad, Pimpri-Chinchwad, Maharashtra, India", "class": "my1", "time": "1:00 AM", "type": "Start" },
+          // { address: "Pune, Maharashtra, India", "class": "my2", "time": "2:00 AM", "type": "End" },
+        ];
+        $scope.showMap = function () {
+          $scope.customMarkers.push({ address: $scope.placeFrom.formatted_address, class: "my1",type: 'Start' })
+          $scope.customMarkers.push({ address: $scope.placeTo.formatted_address, class: "my2",type: 'End' })
+          $scope.myJourney.start = $scope.placeFrom.formatted_address;
+          $scope.myJourney.end=$scope.placeTo.formatted_address;
+          $scope.isMapVisible = true;
+        };
+
+      });
+  </script>
+</head>
+
+<body ng-controller="MainCtrl">
+  <div class="container">
+    <h1 align="center">My Places</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="form">
+          <input class="form-control" g-places-autocomplete ng-model="placeFrom" placeholder="Start Journey At" />
+        </form>
+        <br/>
+      </div>
+
+      <div class="col-md-5">
+        <form class="form">
+          <input class="form-control" g-places-autocomplete ng-model="placeTo" placeholder="End Journey At" />
+        </form>
+      </div>
+      <div class="col-md-2">
+        <form class="form">
+          <button class="btn btn-primary form-control" ng-click="showMap()"> Show Map </button>
+        </form>
+      </div>
+    </div>
+    <!-- <div class="col-md-5">
+        <form class="form">
+          <input class="form-control" g-places-autocomplete ng-model="addMarker" placeholder="Add Marker" />
+        </form>
+      </div>
+      <div class="col-md-2">
+        <form class="form">
+          <button class="btn btn-primary form-control" ng-click="showMap()"> Show Map </button>
+        </form>
+      </div>
+    </div> -->
+    <!-- <div class="row">
+      <div class="col-md-5"> -->
+        <!-- <pre>{{placeFrom | json}}</pre> -->
+        <!-- <div ng-if="placeFrom.name">
+
+          <h5>From:</h5>
+          <pre>{{placeFrom.formatted_address | json}}</pre>
+          <pre>{{placeFrom.geometry.location | json}}</pre>
+          <pre>{{placeFrom.place_id | json}}</pre>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div ng-if="placeTo.name">
+          <h5>To:</h5>
+          <pre>{{placeTo.formatted_address | json}}</pre>
+          <pre>{{placeTo.geometry.location | json}}</pre>
+          <pre>{{placeTo.place_id | json}}</pre>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Marker -->
+  <div ng-if="isMapVisible">
+    <!-- {{customMarkers |json}} -->
+    <ng-map zoom="8" center="{{customMarkers[0].address}}">
+      <directions draggable="false" panel="directions-panel" travel-mode="DRIVING" origin="{{myJourney.start}}"  destination="{{myJourney.end}}">
+      </directions>
+      <custom-marker ng-repeat="cm in customMarkers" position="{{cm.address}}" on-mouseover="mouseover()" on-mouseout="mouseout()"
+        on-click="click()">
+        <div class="{{cm.class}}">
+          <div> {{cm.address}}</div>
+          <div>{{cm.type}}</div>
+        </div>
+      </custom-marker>
+    </ng-map>
+  </div>
+
+  </div>
+
+  
+</body>
+</html>
